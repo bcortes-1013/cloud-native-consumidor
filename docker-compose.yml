@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # --- 1. RABBITMQ ---
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-server
+    ports:
+      - "5672:5672"   # Puerto interno (comunicación entre servicios)
+      - "15672:15672" # Puerto panel web
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - red-microservicios
+
+  # --- 2. PRODUCTOR (Tu imagen v1) ---
+  productor:
+    image: bcortes1013/productor-ms:v1  # <--- Imagen productor
+    container_name: ms-productor
+    ports:
+      - "8080:8080"  # Exponemos puerto para Postman
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq-server
+      - SPRING_RABBITMQ_PORT=5672
+    depends_on:
+      - rabbitmq
+    networks:
+      - red-microservicios
+
+  # --- 3. CONSUMIDOR (Tu imagen v1) ---
+  consumidor:
+    image: bcortes1013/consumidor-ms:v1 # <--- Imagen consumidor
+    container_name: ms-consumidor
+    # No exponemos puertos 8081 porque nadie lo llama desde fuera
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq-server
+      - SPRING_RABBITMQ_PORT=5672
+      # La Wallet ya está DENTRO de tu imagen en /app/wallet (gracias a tu Dockerfile)
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@u0g12ofrwn43uj0p_high?TNS_ADMIN=/app/wallet
+      - SPRING_AMQP_DESERIALIZATION_TRUST_ALL=true
+    volumes:
+      # Mapea la carpeta del contenedor a tu EC2
+      - ./reportes_generados:/app/reportes_generados
+    depends_on:
+      - rabbitmq
+    networks:
+      - red-microservicios
+
+networks:
+  red-microservicios:

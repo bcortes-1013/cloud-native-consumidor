@@ -11,8 +11,8 @@ public class MsConsumidorApplication {
         SpringApplication.run(MsConsumidorApplication.class, args);
     }
 
-    // Escucha la cola 'cola-ruta'
-    @RabbitListener(queues = "cola-ruta")
+    // Escucha la cola 'cola-gps'
+    @RabbitListener(queues = "cola-gps")
     public void recibir(String mensaje) {
         System.out.println(">>> MENSAJE RECIBIDO: " + mensaje);
     }

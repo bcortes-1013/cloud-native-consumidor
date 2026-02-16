@@ -10,6 +10,6 @@ public class RabbitConfig {
     @Bean
     public Queue cola() {
         // "true" significa que la cola es duradera (no se borra si Rabbit se reinicia)
-        return new Queue("cola-ruta", true);
+        return new Queue("cola-gps", true);
     }
 }

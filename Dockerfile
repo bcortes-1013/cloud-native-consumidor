@@ -20,13 +20,9 @@ WORKDIR /app
 # OJO: Ajusta el nombre si tu artifactId no es 'ms-consumidor'
 COPY --from=buildstage /app/target/*.jar app.jar
 
-# --- AQUÍ LA MAGIA DE LA WALLET ---
 # Copiamos la carpeta Wallet desde tu PC hacia adentro de la imagen
 # IMPORTANTE: La carpeta 'Wallet' debe estar al lado de este Dockerfile
 COPY Wallet /app/wallet
-
-# Configuración de entorno
-EXPOSE 8081
 
 # Ejecutamos pasando la propiedad de Oracle
 ENTRYPOINT ["java", "-Doracle.net.tns_admin=/app/wallet", "-jar", "app.jar"]
